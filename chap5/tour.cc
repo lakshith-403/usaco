@@ -9,14 +9,14 @@ LANG: C++
 using namespace std;
 
 int n, v;
-bool conn[100][100];
-int f[100][100];
+bool conn[101][101];
+int f[101][101];
 
 int main() {
   ifstream fin("tour.in");
   fin >> n >> v;
   map<string, int> ids;
-  for (int i = 0; i < n; i++) {
+  for (int i = 1; i <= n; i++) {
     string s;
     fin >> s;
     ids.insert(make_pair(s, i));
@@ -31,21 +31,21 @@ int main() {
   fin.close();
 
   // Dynamic programming.
-  f[0][0] = 1;
-  for (int i = 0; i < n; i++) {
-    for (int j = i + 1; j < n; j++) {
-      for (int k = 0; k < j; k++)
-        if (conn[k][j] && f[i][k] > 0 && f[i][k] + 1 > f[i][j])
-          f[i][j] = f[i][k] + 1;
-      f[j][i] = f[i][j];
+  f[1][1] = 1;
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= n; j++) {
+      if (f[i][j] == 0) continue;
+      for (int k = max(i, j) + 1; k <= n; k++) {
+        if (conn[i][k] && f[i][j] + 1 > f[k][j]) f[k][j] = f[i][j] + 1;
+        if (conn[j][k] && f[i][j] + 1 > f[i][k]) f[i][k] = f[i][j] + 1;
+      }
     }
   }
 
-  // Find optimal.
+  // Find the optimal.
   int ans = 1;
-  for (int i = 0; i < n; i++) {
-    if (conn[i][n - 1] && f[i][n - 1] > ans)
-      ans = f[i][n - 1];
+  for (int i = 1; i < n; i++) {
+    if (conn[i][n] && f[i][n] > ans) ans = f[i][n];
   }
 
   ofstream fout("tour.out");
